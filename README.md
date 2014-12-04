@@ -43,7 +43,7 @@ Command line configuration:
                         http://icanhazip.com/)
 ```
 
-### Example dadns.conf
+### Example daddns.conf
 ```
 [daddns]
 host = https://myprovider.com:2222/
