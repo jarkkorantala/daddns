@@ -96,16 +96,19 @@ class Client(object):
         current_record = re.sub('[\s]+', ' ', current_records[0]).split(' ')
         return current_record
 
-    def delete_record(self, domain, name, addr):
+    def delete_record(self, domain, name):
         assert self.authenticated, 'Not authenticated'
         assert name not in self.PROTECTED_HOSTNAMES, \
             'Cannot change protected host name {}'.format(name)
         response = self.__get('CMD_API_DNS_CONTROL',
                               args={'domain': domain,
                                     'action': 'select',
-                                    'arecs0': ('name={}&value={}'
-                                               .format(name, addr))})
-        response = self.session.get(delete_record_url,
+                                    'arecs0': ('name={}'
+                                               .format(name))})
+        delete_record_url = ('{}/CMD_API_DNS_CONTROL?domain={}&'
+                          'action=delete&type=A&name={}'
+                          .format(self.host, domain, name))
+	response = self.session.get(delete_record_url,
                                     allow_redirects=False)
         assert response.status_code == 200, \
             'Invalid HTTP status code {}'.response.status_code
@@ -116,7 +119,7 @@ class Client(object):
             'Cannot change protected host name {}'.format(name)
         old_addr = self.get_current_ip(domain, name)
         if old_addr:
-            self.delete_record(domain, name, old_addr)
+            self.delete_record(domain, name)
         add_record_url = ('{}/CMD_API_DNS_CONTROL?domain={}&'
                           'action=add&type=A&name={}&value={}'
                           .format(self.host, domain, name, addr))
